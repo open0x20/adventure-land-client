@@ -13,11 +13,12 @@ const attack_mode = true;
 
 var LoaderEventManager = LoaderEventManager || null;
 const intervalIds = [];
+const listeners = [];
 if (LoaderEventManager) {
     LoaderEventManager.subscribe((event) => {
         if (event === "CODE_MODE_SWITCH") {
             intervalIds.forEach((id) => clearInterval(id));
-            character.removeListener("cm");
+            character.removeEventListener("cm", );
         }
      })
 }
@@ -51,7 +52,7 @@ if (character.name != party_leader_name) {
     let slave_target;
     set_message("SC - slave");
 
-    character.addListener("cm", (raw_input) => {
+    const listenerId = character.addListener("cm", (raw_input) => {
         if (raw_input.name != party_leader_name) return;
         const message = raw_input.message;
         slave_target = parent.entities[message.targetUUID];
@@ -60,6 +61,7 @@ if (character.name != party_leader_name) {
         // go to him
         xmove(party_leader.x, party_leader.y);
     });
+    listeners.push(listenerId);
 
 
     const intervalID = setInterval(function() {
