@@ -1,3 +1,4 @@
+log("simple team combat v0.1");
 
 // todo choose party leader by max range
 const party_leader_name = "OrgaRanger01";
@@ -17,13 +18,9 @@ function get_a_target() {
     if(potentioal_target && is_in_range(potentioal_target)) 
     {
         change_target(potentioal_target);
-    } 
-    else 
-    {
-        set_message("No Monsters");
-        return;
+        return potentioal_target;
     }
-    return potentioal_target;
+    return null;
 }
 
 function self_heal_mp() {
@@ -74,13 +71,15 @@ if (character.name != party_leader_name) {
 
     let target_cach;
     setInterval(function() {
-        set_message("SCm - idle");
-
+        
         self_heal_mp();;
 
         if(!attack_mode || character.rip || is_moving(character)) return;
 
         const target = get_a_target();
+        if (!target) {
+            set_message("SCm - no target");
+        }
         
         if (target && target_cach != target.id) {
             send_local_cm(party_members, {action:"simple_combat",targetUUID:target.id})
@@ -91,7 +90,7 @@ if (character.name != party_leader_name) {
         }
 
         if(can_attack(target) && !is_on_cooldown("attack")) {
-            set_message("simple combat attack");
+            set_message("SCm - attack");
             attack(target);
         }
     },1000/4);
