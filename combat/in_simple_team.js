@@ -4,7 +4,8 @@ log("simple team combat v0.1");
 const party_leader_name = "OrgaRanger01";
 
 const party_members = [
-    "orgasmage"
+    "orgasmage",
+    "42Taco"
 ]
 
 const attack_mode = true;
@@ -50,7 +51,7 @@ if (character.name != party_leader_name) {
 
 
     setInterval(function() {
-        
+
         self_heal_mp();
     
         if (!slave_target) {
@@ -64,7 +65,7 @@ if (character.name != party_leader_name) {
         } else {
             set_message("SCs - out of range");
         }
-    })
+    },1000/4)
 
 } else {
     // I'm the party leader !!!!
@@ -82,7 +83,9 @@ if (character.name != party_leader_name) {
         }
         
         if (target && target_cach != target.id) {
-            send_local_cm(party_members, {action:"simple_combat",targetUUID:target.id})
+            party_members.forEach((name) => {
+                send_local_cm(name, {action:"simple_combat",targetUUID:target.id})
+            })
         }
 
         if (target && target_cach != target.id) {
