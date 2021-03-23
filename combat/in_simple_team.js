@@ -18,7 +18,13 @@ if (LoaderEventManager) {
     LoaderEventManager.subscribe((event) => {
         if (event === "CODE_MODE_SWITCH") {
             intervalIds.forEach((id) => clearInterval(id));
-            character.removeEventListener("cm", );
+            listeners.forEach((id) => {
+                var listenerIdx = character.listeners.indexOf(character.listeners.find(function(curr) {
+                    if (curr.id === id)
+                        return true;
+                }));
+                character.listeners.splice(listenerIdx);
+            });
         }
      })
 }
@@ -52,7 +58,7 @@ if (character.name != party_leader_name) {
     let slave_target;
     set_message("SC - slave");
 
-    const listenerId = character.addListener("cm", (raw_input) => {
+    const listenerId = character.on("cm", (raw_input) => {
         if (raw_input.name != party_leader_name) return;
         const message = raw_input.message;
         slave_target = parent.entities[message.targetUUID];
@@ -114,5 +120,3 @@ if (character.name != party_leader_name) {
     },1000/4);
     intervalIds.push(intervalID);
 }
-
-
