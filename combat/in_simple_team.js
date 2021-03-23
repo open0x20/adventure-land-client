@@ -5,6 +5,7 @@ const party_leader_name = "OrgaRanger01";
 
 const party_members = [
     "orgasmage",
+    "OrgaPriest01",
     "42Taco"
 ]
 
@@ -50,7 +51,7 @@ if (character.name != party_leader_name) {
     let slave_target;
     set_message("SC - slave");
 
-    character.on("cm", (raw_input) => {
+    character.addListener("cm", (raw_input) => {
         if (raw_input.name != party_leader_name) return;
         const message = raw_input.message;
         slave_target = parent.entities[message.targetUUID];
