@@ -10,6 +10,7 @@ const party_members = [
 
 const attack_mode = true;
 
+var LoaderEventManager = LoaderEventManager || null;
 const intervalIds = [];
 if (LoaderEventManager) {
     LoaderEventManager.subscribe((event) => {
