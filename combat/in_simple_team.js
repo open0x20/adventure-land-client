@@ -24,8 +24,8 @@ function get_a_target() {
 }
 
 function self_heal_mp() {
-    if (character.mp <= character.max_mp - 100 && !is_regen_cooldown()) use_skill("regen_mp");
     if (character.hp <= character.max_hp - 50 && !is_regen_cooldown()) use_skill("regen_hp");
+    if (character.mp <= character.max_mp - 100 && !is_regen_cooldown()) use_skill("regen_mp");
     loot();
 }
 
