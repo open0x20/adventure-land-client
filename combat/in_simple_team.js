@@ -10,6 +10,16 @@ const party_members = [
 
 const attack_mode = true;
 
+const intervalIds = [];
+if (LoaderEventManager) {
+    LoaderEventManager.subscribe((event) => {
+        if (event === "CODE_MODE_SWITCH") {
+            intervalIds.forEach((id) => clearInterval(id));
+            character.removeListener("cm");
+        }
+     })
+}
+
 // todo auslagern
 // returns a taget in range or null
 function get_a_target() {
@@ -50,7 +60,7 @@ if (character.name != party_leader_name) {
     });
 
 
-    setInterval(function() {
+    const intervalID = setInterval(function() {
 
         self_heal_mp();
     
@@ -66,12 +76,13 @@ if (character.name != party_leader_name) {
             set_message("SCs - out of range");
         }
     },1000/4)
+    intervalIds.push(intervalID);
 
 } else {
     // I'm the party leader !!!!
 
     let target_cach;
-    setInterval(function() {
+    const intervalID = setInterval(function() {
         
         self_heal_mp();;
 
@@ -84,7 +95,7 @@ if (character.name != party_leader_name) {
         
         if (target && target_cach != target.id) {
             party_members.forEach((name) => {
-                send_local_cm(name, {action:"simple_combat",targetUUID:target.id})
+                send_cm(name, {action:"simple_combat",targetUUID:target.id})
             })
         }
 
@@ -97,6 +108,7 @@ if (character.name != party_leader_name) {
             attack(target);
         }
     },1000/4);
+    intervalIds.push(intervalID);
 }
 
 
