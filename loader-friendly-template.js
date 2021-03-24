@@ -56,3 +56,13 @@ function helper2()
 {
 
 }
+
+/**
+ * Finally the call to the main function.
+ * 
+ * Import statements have to be inside the main function as well. The only thing
+ * allowed outside of the main function are helper functions.
+ * 
+ * YOUR COMPLETE CODE HAS TO RESIDE IN THE MAIN FUNCTION!
+ */
+main();
