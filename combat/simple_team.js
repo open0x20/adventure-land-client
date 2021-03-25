@@ -59,11 +59,8 @@ function main() {
 
                 //target exists but not in range, go to target.
                 if (!pathFinding && !character.moving && !is_in_range(target)) {
-
-                    //my own xmove
-                    if(can_move_to(target.x,target.y)) return move(target.x,target.y);
                     pathFinding = true;
-                    smart_move(target.x,target.y, () => {
+                    myXMove(target.x, target.y, () => {
                         pathFinding = false;
                     })
                     return;
@@ -78,11 +75,9 @@ function main() {
             if (character.moving || pathFinding) return;
 
             // there is a master but no target, go to master.
-            if (!pathFinding && simpleMaster && !simpleTarget) {
-                //my own xmove
-                if(can_move_to(simpleMaster.x,simpleMaster.y)) return move(simpleMaster.x,simpleMaster.y);
+            if (!pathFinding && simpleMaster && !simpleTarget && simpleMaster.x != character.x && simpleMaster.y != character.y) {
                 pathFinding = true;
-                smart_move(simpleMaster.x,simpleMaster.y, () => {
+                myXMove(simpleMaster.x, simpleMaster.y, () => {
                     pathFinding = false;
                 })
                 return;
@@ -93,11 +88,24 @@ function main() {
                 set_message("S idel");
                 return;
             }
-
-            //this code should not be called in normal conditions.
-            log("something went wrong");
         }, 1000/4)
         Loader.appendIntervalId(intervalId);
+    }
+}
+
+/**
+ * 
+ * @param {number} x coordinate of destination
+ * @param {number} y coordinate of destination
+ * @param {function} callback is called when path finding is done, not moving is done
+ */
+function myXMove(x, y, callback) {
+    //my own xmove
+    if(can_move_to(x, y)) {
+        move(x, y);
+        callback();
+    } else {
+        smart_move(x, y, callback)
     }
 }
 
