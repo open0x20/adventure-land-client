@@ -17,8 +17,18 @@ function main() {
 
 
 function innitHealer(partyMembers) {
+
+    const eventIdHit = character.on("hit", (data) => {
+        const potential_enemy = get_monster(data.actor);
+        if (!potential_enemy) return;
+        send_cm("OrgaWa01", {
+            type: "TAUNT_ENEMY",
+            enemyId: potential_enemy.id
+        });
+    })
+
     let targetId = null;
-    const eventId = character.on("cm", (raw_data) => {
+    const eventIdCm = character.on("cm", (raw_data) => {
         //todo more generic
         if (!raw_data.name === partyMembers[0]) return;
         const message = raw_data.message;
@@ -36,7 +46,8 @@ function innitHealer(partyMembers) {
                 log("unknow type of request")
         }
     });
-    Loader.appendCharacterEventId(eventId);
+    Loader.appendCharacterEventId(eventIdCm);
+    Loader.appendCharacterEventId(eventIdHit);
 
     const intervalId = setInterval(() => {
         regenHpMp();
@@ -80,6 +91,20 @@ function innitTank(partyMembers) {
 
 		searchForNextTarget = !searchForNextTarget;
 	});
+
+    const eventIdTauntRequest = character.on("cm", (raw_data) => {
+        // generic
+        if (raw_data.name != "OrgaPriest01") return;
+        const message = raw_data.message;
+        if (message.type && message.type === "TAUNT_ENEMY") {
+            const target = get_monster(message.enemyId)
+            // the character needs to have less than 2 targets (enemies on him) and the taunt skill needs to be avalible (write own function)
+            if (target && character.targets <= 1 && !is_on_cooldown("taunt") && is_in_range(target, "taunt") && new Date()>=parent.next_skill.taunt) {
+                use_skill("taunt", target);
+            }
+        }
+    })
+    Loader.appendCharacterEventId(eventIdTauntRequest);
 
     //todo more generic
     send_party_invite(partyMembers[1]);
