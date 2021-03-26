@@ -72,6 +72,15 @@ function innitHealer(partyMembers) {
 }
 
 function innitTank(partyMembers) {
+
+    let searchForNextTarget = true;
+    add_bottom_button("toggel_auto_attack", "🗡️", () => {
+        if (!searchForNextTarget) set_button_color("toggel_auto_attack", "red")
+        if (searchForNextTarget) set_button_color("toggel_auto_attack", "blue")
+
+		searchForNextTarget = !searchForNextTarget;
+	});
+
     //todo more generic
     send_party_invite(partyMembers[1]);
 
@@ -87,7 +96,7 @@ function innitTank(partyMembers) {
         }
 
         let target = get_targeted_monster();
-        if (!target && character.hp >= (character.max_hp - 50) && !is_on_cooldown("taunt")) {
+        if (searchForNextTarget && !target && character.hp >= (character.max_hp - 50) && !is_on_cooldown("taunt")) {
             
             target = getNextMonster({
                 types: ["bee", "goo", "crab"],
@@ -189,6 +198,10 @@ function on_party_invite(name) {
     if (name && name === "OrgaWa01") accept_party_invite(name);;
 }
 
-
+Loader.subscribe((eventName) => {
+    if (eventName === "CODE_MODE_SWITCH") {
+        clear_buttons()
+    }
+});
 
 main()
