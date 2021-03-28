@@ -48,6 +48,7 @@ function spreadBreadcrumbsInit() {
     Loader.appendIntervalId(breadcrumbIntervalId);
 }
 
+//todo issue on loader code switch
 function followBreadcrumbInnit() {
     const breadcrumbEventId = character.on("cm", (raw_data) => {
         if (raw_data.name != get("partyLeader")) return;
@@ -56,26 +57,47 @@ function followBreadcrumbInnit() {
         const maxDistanceToLeader = 50;
         const partyLeader = get_player(get("partyLeader"));
 
+        // todo fix comment
         // if party leader is out of range
         if (partyLeader && Math.ceil(distance(character, partyLeader)) > maxDistanceToLeader && can_move_to(partyLeader.x, partyLeader.y)) {
             // move to party leader 
             // todo - change max distance for distance characters
             move(partyLeader.x, partyLeader.y);
-        } else if (!partyLeader && !get(character.name + "-isPathfinding")) {
-            set(character.name + "-isPathfinding", true);
-
-            const destination = {
-                map: raw_data.message.map,
-                x: raw_data.message.x,
-                y: raw_data.message.y
+            return;
+        } 
+        if (character.moving) {
+            const breadcrubs = get(character.name + "-breadcrumbs") || [];
+            breadcrubs.unshift(raw_data.message);
+            set(character.name + "-breadcrumbs", breadcrubs);
+            // todo check if list is to long
+        } else {
+            const breadcrubs = get(character.name + "-breadcrumbs") || [];
+            for (let i = 0; i < breadcrubs.length; i++) {
+                if (can_move_to(breadcrubs[i].x, breadcrubs[i].y)) {
+                    move(breadcrubs[i].x, breadcrubs[i].y);
+                    // remove all old breadcrumbs from the list
+                    breadcrubs.splice(i + 1, breadcrubs.length - (i + i));
+                    set(character.name + "-breadcrumbs", breadcrubs);
+                    return;
+                }
             }
+            // can't move to any of the breadcrumbs
+            set(character.name + "-breadcrumbs", []);
 
-            smart_move(destination, () => {
-                set(character.name + "-isPathfinding", false);
-            })
+            if (!get(character.name + "-isPathfinding")) {
+                set(character.name + "-isPathfinding", true);
+    
+                const destination = {
+                    map: raw_data.message.map,
+                    x: raw_data.message.x,
+                    y: raw_data.message.y
+                }
+    
+                smart_move(destination, () => {
+                    set(character.name + "-isPathfinding", false);
+                })
+            }
         }
-        
-        
     });
     Loader.appendCharacterEventId(breadcrumbEventId);
 }
