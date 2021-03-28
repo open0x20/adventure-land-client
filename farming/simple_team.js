@@ -4,7 +4,7 @@ function main() {
     const partyMembers = ["OrgaRanger01", "OrgaPriest01"]; 
 
     set("partyLeader", partyLeader);
-    set("partyMembers", partyMembers);
+    set("potentialPartyMembers", partyMembers);
 
     // set to true to enable auto attacking monsters
     set("autoTargeting", false);
@@ -37,8 +37,8 @@ function main() {
 // movement
 function spreadBreadcrumbsInit() {
     const breadcrumbIntervalId = setInterval(() => {
-        // todo send updates only to party members
-        send_cm(get("partyMembers"), {
+        // parent.party is an infrequently updated object
+        send_cm(parent.party, {
             type: "breadcrumb",
             map: character.map,
             x: character.x,
@@ -137,7 +137,7 @@ function on_party_invite(name) {
 }
 
 function on_party_request(name) {
-    if (get("partyMembers").includes(name)) accept_party_request(name)
+    if (get("potentialPartyMembers").includes(name)) accept_party_request(name)
 }
 
 main();
