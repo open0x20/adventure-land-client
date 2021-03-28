@@ -1,6 +1,6 @@
 function main() {
     const partyLeader = "OrgaWa01";
-    //array olds the names of character how can join the party, not the characters in the current party
+    //array holds the names of character who can join the party, not the characters in the current party
     const partyMembers = ["OrgaRanger01", "OrgaPriest01"]; 
 
     set("partyLeader", partyLeader);
@@ -37,7 +37,7 @@ function main() {
 // movement
 function spreadBreadcrumbsInit() {
     const breadcrumbIntervalId = setInterval(() => {
-        //log("spread breadcrumb")
+        // todo send updates only to party members
         send_cm(get("partyMembers"), {
             type: "breadcrumb",
             map: character.map,
@@ -57,7 +57,9 @@ function followBreadcrumbInnit() {
         const maxDistanceToLeader = 50;
         const partyLeader = get_player(get("partyLeader"));
 
-        // todo fix comment
+        // I'm with my master
+        if (partyLeader && Math.ceil(distance(character, partyLeader)) <= maxDistanceToLeader) return;
+
         // if party leader is out of range
         if (partyLeader && Math.ceil(distance(character, partyLeader)) > maxDistanceToLeader && can_move_to(partyLeader.x, partyLeader.y)) {
             // move to party leader 
@@ -76,7 +78,7 @@ function followBreadcrumbInnit() {
                 if (can_move_to(breadcrubs[i].x, breadcrubs[i].y)) {
                     move(breadcrubs[i].x, breadcrubs[i].y);
                     // remove all old breadcrumbs from the list
-                    breadcrubs.splice(i + 1, breadcrubs.length - (i + i));
+                    breadcrubs.splice(i, breadcrubs.length);
                     set(character.name + "-breadcrumbs", breadcrubs);
                     return;
                 }
@@ -84,7 +86,8 @@ function followBreadcrumbInnit() {
             // can't move to any of the breadcrumbs
             set(character.name + "-breadcrumbs", []);
 
-            if (!get(character.name + "-isPathfinding")) {
+            // only one character can be in the bank
+            if (!get(character.name + "-isPathfinding") && raw_data.message.map != "bank") {
                 set(character.name + "-isPathfinding", true);
     
                 const destination = {
@@ -107,7 +110,6 @@ function followBreadcrumbInnit() {
 function loadButtons() {
     // auto Targeting button
     // todo implement attack logic
-    // todo add remove buttons on code switch
     function toggleAutoTargetingButtonColor() {
         const autoTargeting = get("autoTargeting");
         if (!autoTargeting) set_button_color("toggel_auto_attack", "blue");
@@ -121,6 +123,12 @@ function loadButtons() {
 }
 
 
+//loader events
+Loader.subscribe((eventName) => {
+    if (eventName === "CODE_MODE_SWITCH") {
+        clear_buttons();
+    }
+})
 
 
 //server amagic funcions
